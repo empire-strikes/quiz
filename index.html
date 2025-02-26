@@ -116,6 +116,7 @@
             }
 
             function showResults(score, total) {
+                quizContainer.innerHTML = ''; // Clear the quiz container
                 const resultCard = document.createElement('div');
                 resultCard.className = 'card';
                 resultCard.textContent = `You scored ${score} out of ${total}`;
