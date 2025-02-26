@@ -76,10 +76,20 @@
                 const questions = await response.json();
                 const userAnswers = {};
                 let score = 0;
+                let currentQuestionIndex = 0;
+
+                function showQuestion(index) {
+                    const allCards = document.querySelectorAll('.question-card');
+                    allCards.forEach(card => card.style.display = 'none');
+                    if (allCards[index]) {
+                        allCards[index].style.display = 'block';
+                    }
+                }
 
                 questions.forEach((q, index) => {
                     const card = document.createElement('div');
-                    card.className = 'card';
+                    card.className = 'card question-card';
+                    card.style.display = 'none';
                     const questionText = document.createElement('p');
                     questionText.textContent = q.question;
                     card.appendChild(questionText);
@@ -90,9 +100,10 @@
                         button.onclick = function () {
                             userAnswers[q.question] = choiceIndex;
                             if (choiceIndex === q.answer) score++;
-                            card.style.display = 'none';
                             if (index === questions.length - 1) {
                                 showResults(score, questions.length);
+                            } else {
+                                showQuestion(++currentQuestionIndex);
                             }
                         };
                         card.appendChild(button);
@@ -100,6 +111,8 @@
 
                     quizContainer.appendChild(card);
                 });
+
+                showQuestion(currentQuestionIndex);
             }
 
             function showResults(score, total) {
