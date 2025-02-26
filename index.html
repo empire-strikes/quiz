@@ -44,6 +44,15 @@
             text-align: center; /* Center align the title */
             text-transform: lowercase; /* Convert the title to lowercase */
         }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .nav-buttons button {
+            width: 48%;
+        }
     </style>
     <script defer>
         document.addEventListener('DOMContentLoaded', function () {
@@ -54,6 +63,11 @@
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.placeholder = 'Enter your name';
+            nameInput.style.padding = '10px'; // Add padding to match button aesthetics
+            nameInput.style.borderRadius = '8px'; // Add border-radius to match button aesthetics
+            nameInput.style.border = '1px solid #e6e6e6'; // Add border to match button aesthetics
+            nameInput.style.width = '100%'; // Full width
+
             const nameButton = document.createElement('button');
             nameButton.textContent = 'Start Quiz';
 
@@ -75,11 +89,15 @@
                 const response = await fetch('questions.json');
                 const questions = await response.json();
                 const userAnswers = {};
+                let currentQuestionIndex = 0;
                 let score = 0;
 
-                questions.forEach((q, index) => {
+                function showQuestion(index) {
+                    quizContainer.innerHTML = '';
+                    const q = questions[index];
                     const card = document.createElement('div');
                     card.className = 'card';
+
                     const questionText = document.createElement('p');
                     questionText.textContent = q.question;
                     card.appendChild(questionText);
@@ -90,16 +108,44 @@
                         button.onclick = function () {
                             userAnswers[q.question] = choiceIndex;
                             if (choiceIndex === q.answer) score++;
-                            card.style.display = 'none';
-                            if (index === questions.length - 1) {
-                                showResults(score, questions.length);
-                            }
                         };
                         card.appendChild(button);
                     });
 
+                    const navButtons = document.createElement('div');
+                    navButtons.className = 'nav-buttons';
+
+                    if (index > 0) {
+                        const prevButton = document.createElement('button');
+                        prevButton.textContent = 'Previous';
+                        prevButton.onclick = function () {
+                            showQuestion(index - 1);
+                        };
+                        navButtons.appendChild(prevButton);
+                    }
+
+                    if (index < questions.length - 1) {
+                        const nextButton = document.createElement('button');
+                        nextButton.textContent = 'Next';
+                        nextButton.onclick = function () {
+                            showQuestion(index + 1);
+                        };
+                        navButtons.appendChild(nextButton);
+                    } else {
+                        const finishButton = document.createElement('button');
+                        finishButton.textContent = 'Finish';
+                        finishButton.onclick = function () {
+                            quizContainer.innerHTML = '';
+                            showResults(score, questions.length);
+                        };
+                        navButtons.appendChild(finishButton);
+                    }
+
+                    card.appendChild(navButtons);
                     quizContainer.appendChild(card);
-                });
+                }
+
+                showQuestion(currentQuestionIndex);
             }
 
             function showResults(score, total) {
