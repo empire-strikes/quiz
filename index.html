@@ -76,6 +76,7 @@
                 const response = await fetch('answers.json');
                 const data = await response.json();
                 const questions = data.questions;
+                const correctAnswers = data.answers;
                 let score = 0;
                 let currentQuestionIndex = 0;
 
@@ -97,7 +98,7 @@
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
-                            if (answer === question.correctAnswer) {
+                            if (answer === correctAnswers[index]) {
                                 score++;
                             }
                             card.style.display = 'none';
