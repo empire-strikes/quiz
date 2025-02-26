@@ -44,12 +44,6 @@
             text-align: center; /* Center align the title */
             text-transform: lowercase; /* Convert the title to lowercase */
         }
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 300px;
-        }
     </style>
     <script defer>
         document.addEventListener('DOMContentLoaded', function () {
@@ -82,70 +76,33 @@
                 const questions = await response.json();
                 const userAnswers = {};
                 let score = 0;
-                let currentQuestionIndex = 0;
 
-                const questionCard = document.createElement('div');
-                questionCard.className = 'card';
+                questions.forEach((q, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const questionText = document.createElement('p');
+                    questionText.textContent = q.question;
+                    card.appendChild(questionText);
 
-                const questionText = document.createElement('p');
-                questionCard.appendChild(questionText);
-
-                const choicesContainer = document.createElement('div');
-                questionCard.appendChild(choicesContainer);
-
-                const navigation = document.createElement('div');
-                navigation.className = 'navigation';
-                const prevButton = document.createElement('button');
-                prevButton.textContent = 'Previous';
-                prevButton.onclick = showPreviousQuestion;
-                const nextButton = document.createElement('button');
-                nextButton.textContent = 'Next';
-                nextButton.onclick = showNextQuestion;
-
-                navigation.appendChild(prevButton);
-                navigation.appendChild(nextButton);
-                quizContainer.appendChild(questionCard);
-                quizContainer.appendChild(navigation);
-
-                function showQuestion(index) {
-                    const question = questions[index];
-                    questionText.textContent = question.question;
-                    choicesContainer.innerHTML = '';
-                    question.choices.forEach((answer, choiceIndex) => {
+                    q.choices.forEach((answer, choiceIndex) => {
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
-                            userAnswers[question.question] = choiceIndex;
-                            if (choiceIndex === question.answer) score++;
+                            userAnswers[q.question] = choiceIndex;
+                            if (choiceIndex === q.answer) score++;
+                            card.style.display = 'none';
+                            if (index === questions.length - 1) {
+                                showResults(score, questions.length);
+                            }
                         };
-                        choicesContainer.appendChild(button);
+                        card.appendChild(button);
                     });
 
-                    prevButton.disabled = index === 0;
-                    nextButton.textContent = index === questions.length - 1 ? 'Finish' : 'Next';
-                }
-
-                function showNextQuestion() {
-                    if (currentQuestionIndex < questions.length - 1) {
-                        currentQuestionIndex++;
-                    } else {
-                        showResults(score, questions.length);
-                    }
-                    showQuestion(currentQuestionIndex);
-                }
-
-                function showPreviousQuestion() {
-                    if (currentQuestionIndex > 0) {
-                        currentQuestionIndex--;
-                    }
-                    showQuestion(currentQuestionIndex);
-                }
-
-                showQuestion(currentQuestionIndex);
+                    quizContainer.appendChild(card);
+                });
             }
 
             function showResults(score, total) {
-                quizContainer.innerHTML = '';
                 const resultCard = document.createElement('div');
                 resultCard.className = 'card';
                 resultCard.textContent = `You scored ${score} out of ${total}`;
