@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
+    <title>Markets So Bad You're Here</title>
     <style>
         body {
-            background-color: #ececec; /* Matte color background */
+            background-color: #ececec;
             font-family: Arial, sans-serif;
         }
         #quiz-container {
@@ -50,11 +50,11 @@
             const nameButton = document.createElement('button');
             nameButton.textContent = 'Start Quiz';
 
-            nameButton.onclick = function () {
+            nameButton.onclick = async function () {
                 if (nameInput.value.trim() !== '') {
                     localStorage.setItem('userName', nameInput.value);
                     nameContainer.style.display = 'none';
-                    startQuiz();
+                    await startQuiz();
                 } else {
                     alert('Please enter your name.');
                 }
@@ -64,12 +64,11 @@
             nameContainer.appendChild(nameButton);
             quizContainer.appendChild(nameContainer);
 
-            function startQuiz() {
-                const questions = [
-                    { question: 'What is the capital of France?', answers: ['Paris', 'London', 'Berlin', 'Rome'] },
-                    { question: 'What is 2 + 2?', answers: ['3', '4', '5', '6'] },
-                    // Add more questions as needed
-                ];
+            async function startQuiz() {
+                const response = await fetch('questions.json');
+                const questions = await response.json();
+                const userAnswers = {};
+                let score = 0;
 
                 questions.forEach((q, index) => {
                     const card = document.createElement('div');
@@ -78,15 +77,16 @@
                     questionText.textContent = q.question;
                     card.appendChild(questionText);
 
-                    q.answers.forEach(answer => {
+                    q.choices.forEach((answer, choiceIndex) => {
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
-                            const userName = localStorage.getItem('userName');
-                            const answers = JSON.parse(localStorage.getItem('answers')) || {};
-                            answers[q.question] = answer;
-                            localStorage.setItem('answers', JSON.stringify(answers));
+                            userAnswers[q.question] = choiceIndex;
+                            if (choiceIndex === q.answer) score++;
                             card.style.display = 'none';
+                            if (index === questions.length - 1) {
+                                showResults(score, questions.length);
+                            }
                         };
                         card.appendChild(button);
                     });
@@ -94,11 +94,18 @@
                     quizContainer.appendChild(card);
                 });
             }
+
+            function showResults(score, total) {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'card';
+                resultCard.textContent = `You scored ${score} out of ${total}`;
+                quizContainer.appendChild(resultCard);
+            }
         });
     </script>
 </head>
 <body>
-    <h1>Quiz</h1>
+    <h1>Markets So Bad You're Here</h1>
     <div id="quiz-container"></div>
 </body>
 </html>
