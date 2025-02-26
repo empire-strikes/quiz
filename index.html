@@ -6,7 +6,7 @@
     <title>Quiz</title>
     <style>
         body {
-            background-color: #ececec; /* Matte color background */
+            background-color: #ececec;
             font-family: Arial, sans-serif;
         }
         #quiz-container {
@@ -37,19 +37,27 @@
         .card button:hover {
             background-color: #0056b3;
         }
+        #score-container {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
     <script defer>
         document.addEventListener('DOMContentLoaded', function () {
             const quizContainer = document.getElementById('quiz-container');
             const nameContainer = document.createElement('div');
             nameContainer.className = 'card';
-
+        
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.placeholder = 'Enter your name';
             const nameButton = document.createElement('button');
             nameButton.textContent = 'Start Quiz';
-
+        
             nameButton.onclick = function () {
                 if (nameInput.value.trim() !== '') {
                     localStorage.setItem('userName', nameInput.value);
@@ -59,40 +67,55 @@
                     alert('Please enter your name.');
                 }
             };
-
+        
             nameContainer.appendChild(nameInput);
             nameContainer.appendChild(nameButton);
             quizContainer.appendChild(nameContainer);
 
-            function startQuiz() {
-                const questions = [
-                    { question: 'What is the capital of France?', answers: ['Paris', 'London', 'Berlin', 'Rome'] },
-                    { question: 'What is 2 + 2?', answers: ['3', '4', '5', '6'] },
-                    // Add more questions as needed
-                ];
+            async function startQuiz() {
+                const response = await fetch('answers.json');
+                const data = await response.json();
+                const questions = data.questions;
+                const correctAnswers = data.answers;
+                let score = 0;
+                let currentQuestionIndex = 0;
 
-                questions.forEach((q, index) => {
+                function showScore() {
+                    const scoreContainer = document.getElementById('score-container');
+                    scoreContainer.style.display = 'block';
+                    scoreContainer.textContent = `Your score is ${score} out of ${questions.length}`;
+                }
+
+                function showQuestion(index) {
+                    const question = questions[index];
                     const card = document.createElement('div');
                     card.className = 'card';
                     const questionText = document.createElement('p');
-                    questionText.textContent = q.question;
+                    questionText.textContent = question.question;
                     card.appendChild(questionText);
 
-                    q.answers.forEach(answer => {
+                    question.answers.forEach(answer => {
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
-                            const userName = localStorage.getItem('userName');
-                            const answers = JSON.parse(localStorage.getItem('answers')) || {};
-                            answers[q.question] = answer;
-                            localStorage.setItem('answers', JSON.stringify(answers));
+                            if (answer === correctAnswers[index]) {
+                                score++;
+                            }
                             card.style.display = 'none';
+                            currentQuestionIndex++;
+                            if (currentQuestionIndex < questions.length) {
+                                showQuestion(currentQuestionIndex);
+                            } else {
+                                showScore();
+                            }
                         };
                         card.appendChild(button);
                     });
 
                     quizContainer.appendChild(card);
-                });
+                }
+
+                showQuestion(currentQuestionIndex);
             }
         });
     </script>
@@ -100,5 +123,6 @@
 <body>
     <h1>Quiz</h1>
     <div id="quiz-container"></div>
+    <div id="score-container"></div>
 </body>
 </html>
