@@ -41,31 +41,59 @@
     <script defer>
         document.addEventListener('DOMContentLoaded', function () {
             const quizContainer = document.getElementById('quiz-container');
+            const nameContainer = document.createElement('div');
+            nameContainer.className = 'card';
 
-            const questions = [
-                { question: 'What is the capital of France?', answers: ['Paris', 'London', 'Berlin', 'Rome'] },
-                { question: 'What is 2 + 2?', answers: ['3', '4', '5', '6'] },
-                // Add more questions as needed
-            ];
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Enter your name';
+            const nameButton = document.createElement('button');
+            nameButton.textContent = 'Start Quiz';
 
-            questions.forEach((q, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                const questionText = document.createElement('p');
-                questionText.textContent = q.question;
-                card.appendChild(questionText);
+            nameButton.onclick = function () {
+                if (nameInput.value.trim() !== '') {
+                    localStorage.setItem('userName', nameInput.value);
+                    nameContainer.style.display = 'none';
+                    startQuiz();
+                } else {
+                    alert('Please enter your name.');
+                }
+            };
 
-                q.answers.forEach(answer => {
-                    const button = document.createElement('button');
-                    button.textContent = answer;
-                    button.onclick = function () {
-                        card.style.display = 'none';
-                    };
-                    card.appendChild(button);
+            nameContainer.appendChild(nameInput);
+            nameContainer.appendChild(nameButton);
+            quizContainer.appendChild(nameContainer);
+
+            function startQuiz() {
+                const questions = [
+                    { question: 'What is the capital of France?', answers: ['Paris', 'London', 'Berlin', 'Rome'] },
+                    { question: 'What is 2 + 2?', answers: ['3', '4', '5', '6'] },
+                    // Add more questions as needed
+                ];
+
+                questions.forEach((q, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    const questionText = document.createElement('p');
+                    questionText.textContent = q.question;
+                    card.appendChild(questionText);
+
+                    q.answers.forEach(answer => {
+                        const button = document.createElement('button');
+                        button.textContent = answer;
+                        button.onclick = function () {
+                            const userName = localStorage.getItem('userName');
+                            const answers = JSON.parse(localStorage.getItem('answers')) || {};
+                            answers[q.question] = answer;
+                            localStorage.setItem('answers', JSON.stringify(answers));
+                            card.style.display = 'none';
+                        };
+                        card.appendChild(button);
+                    });
+
+                    quizContainer.appendChild(card);
                 });
-
-                quizContainer.appendChild(card);
-            });
+            }
         });
     </script>
 </head>
