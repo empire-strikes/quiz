@@ -44,6 +44,9 @@
             text-align: center; /* Center align the title */
             text-transform: lowercase; /* Convert the title to lowercase */
         }
+        .highlighted {
+            background-color: #d4af37; /* Highlight color */
+        }
     </style>
     <script defer>
         document.addEventListener('DOMContentLoaded', function () {
@@ -86,6 +89,11 @@
                     }
                 }
 
+                function highlightButton(button) {
+                    document.querySelectorAll('.question-card button').forEach(btn => btn.classList.remove('highlighted'));
+                    button.classList.add('highlighted');
+                }
+
                 questions.forEach((q, index) => {
                     const card = document.createElement('div');
                     card.className = 'card question-card';
@@ -98,19 +106,38 @@
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
+                            highlightButton(button);
                             userAnswers[q.question] = choiceIndex;
                             if (choiceIndex === q.answer) score++;
-                            if (index === questions.length - 1) {
-                                showResults(score, questions.length);
-                            } else {
-                                showQuestion(++currentQuestionIndex);
-                            }
                         };
                         card.appendChild(button);
                     });
 
                     quizContainer.appendChild(card);
                 });
+
+                const navigationContainer = document.createElement('div');
+                navigationContainer.className = 'card';
+
+                const prevButton = document.createElement('button');
+                prevButton.textContent = 'Previous';
+                prevButton.onclick = function () {
+                    if (currentQuestionIndex > 0) showQuestion(--currentQuestionIndex);
+                };
+
+                const nextButton = document.createElement('button');
+                nextButton.textContent = 'Next';
+                nextButton.onclick = function () {
+                    if (currentQuestionIndex < questions.length - 1) {
+                        showQuestion(++currentQuestionIndex);
+                    } else {
+                        showResults(score, questions.length);
+                    }
+                };
+
+                navigationContainer.appendChild(prevButton);
+                navigationContainer.appendChild(nextButton);
+                quizContainer.appendChild(navigationContainer);
 
                 showQuestion(currentQuestionIndex);
             }
