@@ -6,7 +6,7 @@
     <title>markets so bad you're here</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-        
+
         body {
             background-color: #f4f9f4;
             font-family: 'Poppins', sans-serif;
@@ -90,7 +90,6 @@
                 const questions = await response.json();
                 const userAnswers = {};
                 let currentQuestionIndex = 0;
-                let score = 0;
 
                 function showQuestion(index) {
                     quizContainer.innerHTML = '';
@@ -107,7 +106,6 @@
                         button.textContent = answer;
                         button.onclick = function () {
                             userAnswers[q.question] = choiceIndex;
-                            if (choiceIndex === q.answer) score++;
                         };
                         card.appendChild(button);
                     });
@@ -136,7 +134,7 @@
                         finishButton.textContent = 'Finish';
                         finishButton.onclick = function () {
                             quizContainer.innerHTML = '';
-                            showResults(score, questions.length);
+                            calculateScore();
                         };
                         navButtons.appendChild(finishButton);
                     }
@@ -145,14 +143,24 @@
                     quizContainer.appendChild(card);
                 }
 
-                showQuestion(currentQuestionIndex);
-            }
+                function calculateScore() {
+                    let score = 0;
+                    questions.forEach(q => {
+                        if (userAnswers[q.question] === q.answer) {
+                            score++;
+                        }
+                    });
+                    showResults(score, questions.length);
+                }
 
-            function showResults(score, total) {
-                const resultCard = document.createElement('div');
-                resultCard.className = 'card';
-                resultCard.textContent = `You scored ${score} out of ${total}`;
-                quizContainer.appendChild(resultCard);
+                function showResults(score, total) {
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'card';
+                    resultCard.textContent = `You scored ${score} out of ${total}`;
+                    quizContainer.appendChild(resultCard);
+                }
+
+                showQuestion(currentQuestionIndex);
             }
         });
     </script>
