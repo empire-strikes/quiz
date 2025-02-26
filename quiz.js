@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const quizContainer = document.getElementById('quiz-container');
     
-    // Fetch questions from the repository
-    const response = await fetch('questions.json');
+    // Fetch answers from the repository
+    const response = await fetch('answers.json');
     const questions = await response.json();
     
     // Render questions
