@@ -51,13 +51,13 @@
             const quizContainer = document.getElementById('quiz-container');
             const nameContainer = document.createElement('div');
             nameContainer.className = 'card';
-        
+
             const nameInput = document.createElement('input');
             nameInput.type = 'text';
             nameInput.placeholder = 'Enter your name';
             const nameButton = document.createElement('button');
             nameButton.textContent = 'Start Quiz';
-        
+
             nameButton.onclick = function () {
                 if (nameInput.value.trim() !== '') {
                     localStorage.setItem('userName', nameInput.value);
@@ -67,7 +67,7 @@
                     alert('Please enter your name.');
                 }
             };
-        
+
             nameContainer.appendChild(nameInput);
             nameContainer.appendChild(nameButton);
             quizContainer.appendChild(nameContainer);
@@ -76,7 +76,6 @@
                 const response = await fetch('answers.json');
                 const data = await response.json();
                 const questions = data.questions;
-                const correctAnswers = data.answers;
                 let score = 0;
                 let currentQuestionIndex = 0;
 
@@ -98,7 +97,7 @@
                         const button = document.createElement('button');
                         button.textContent = answer;
                         button.onclick = function () {
-                            if (answer === correctAnswers[index]) {
+                            if (answer === question.correctAnswer) {
                                 score++;
                             }
                             card.style.display = 'none';
